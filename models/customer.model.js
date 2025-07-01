@@ -5,7 +5,7 @@ const customerSchema = new mongoose.Schema({
   // email:    { type: String, required: false ,sparse: true},
   phone:    { type: String, required: true, unique: true },
   address:  { type: String, required: true },
-  pickupDate: Date,         // <-- Add this
+  bookingDate: Date,         // <-- Add this
   totalAmount: Number  , // <-- Add this
   isDelivered: Boolean  , // <-- Add this
   pickupPreference: { type: String, enum: ['Home', 'Shop'], default: 'Shop' },

@@ -75,3 +75,24 @@ exports.deleteRollOrPress = async (req, res) => {
     res.status(500).json({ message: 'Server error', error });
   }
 };
+
+// Update positions of dress types
+exports.updateDressPositions = async (req, res) => {
+  try {
+    const updates = req.body; // Array of items with updated positions
+
+    const bulkOps = updates.map(item => ({
+      updateOne: {
+        filter: { _id: item._id },
+        update: { $set: { position: item.position } }
+      }
+    }));
+
+    await DressMaster.bulkWrite(bulkOps);
+
+    res.json({ message: 'Positions updated successfully' });
+  } catch (error) {
+    console.error('Error updating positions:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+} ;

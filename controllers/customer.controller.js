@@ -54,7 +54,7 @@ exports.updateOrderInfo = async (req, res) => {
             customer._id,
             {
               $set: {
-                pickupDate: latestOrder.pickupDetails?.date || null,
+                bookingDate: latestOrder.pickupDetails?.date || null,
                 totalAmount: latestOrder.charges?.totalAmount || 0,
               },
             }
@@ -73,15 +73,15 @@ exports.updateOrderInfo = async (req, res) => {
 exports.updatePickupDate = async (req, res) => {
   try {
     const { customerId } = req.params;
-    const { pickupDate } = req.body;
+    const { bookingDate } = req.body;
 
-    if (!pickupDate) {
-      return res.status(400).json({ error: 'pickupDate is required.' });
+    if (!bookingDate) {
+      return res.status(400).json({ error: 'bookingDate is required.' });
     }
 
     const updatedCustomer = await Customer.findByIdAndUpdate(
       customerId,
-      { $set: { pickupDate, isDelivered: true } },
+      { $set: { bookingDate, isDelivered: true } },
       { new: true }
     );
 

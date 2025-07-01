@@ -13,6 +13,9 @@ const dressMasterSchema = new mongoose.Schema(
       type: Number,
       required: true,
       min: 1
+    },
+    position: {
+      type: Number
     }
   },
   {

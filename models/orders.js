@@ -71,6 +71,13 @@ const OrderSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  isDelivered: {
+    type: Boolean,
+    default: false,
+  },
+  deliveryNotifiedDate: {
+    type: Date,
+  },
 });
 
 module.exports = mongoose.model('Order', OrderSchema);

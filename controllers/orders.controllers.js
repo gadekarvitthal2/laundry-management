@@ -16,7 +16,8 @@ async function getNextBillNumber() {
   return counter.sequence_value.toString().padStart(6, "0"); // 👈 6-digit format
 }
 
-exports.createOrder = ("/",
+exports.createOrder =
+  ("/",
   async (req, res) => {
     try {
       // const orderData = req.body;
@@ -241,36 +242,36 @@ exports.getAllOrdersWithCustomerInfo = async (req, res) => {
     //   },
     //   { $sort: { createdAt: -1 } }
     // ]);
-const results = await Order.aggregate([
-  { $match: { customerId: objectId } },
-  {
-    $lookup: {
-      from: "customers",
-      localField: "customerId",
-      foreignField: "_id",
-      as: "customerInfo",
-    },
-  },
-  { $unwind: "$customerInfo" },
-  {
-    $project: {
-      serviceType: 1,
-      items: 1,
-      pickupDetails: 1,
-      deliveryDetails: 1,
-      charges: 1,
-      createdAt: 1,
-      fullName: "$customerInfo.fullName",
-      address: "$customerInfo.address",
-      phone: "$customerInfo.phone",
-      isDelivered: 1, // Keep this from Order
-      totalAmount: 1,
-      pickupPreference: 1,
-      billNumber: 1,
-    },
-  },
-  { $sort: { createdAt: -1 } } // ✅ Sort latest first
-]);
+    const results = await Order.aggregate([
+      { $match: { customerId: objectId } },
+      {
+        $lookup: {
+          from: "customers",
+          localField: "customerId",
+          foreignField: "_id",
+          as: "customerInfo",
+        },
+      },
+      { $unwind: "$customerInfo" },
+      {
+        $project: {
+          serviceType: 1,
+          items: 1,
+          pickupDetails: 1,
+          deliveryDetails: 1,
+          charges: 1,
+          createdAt: 1,
+          fullName: "$customerInfo.fullName",
+          address: "$customerInfo.address",
+          phone: "$customerInfo.phone",
+          isDelivered: 1, // Keep this from Order
+          totalAmount: 1,
+          pickupPreference: 1,
+          billNumber: 1,
+        },
+      },
+      { $sort: { createdAt: -1 } }, // ✅ Sort latest first
+    ]);
 
     res.status(200).json(results);
   } catch (error) {
@@ -279,34 +280,41 @@ const results = await Order.aggregate([
   }
 };
 
-// exports.uploadAndSendPdf = async (req, res) => {
-//   console.log("Received file upload request", req.file);
+exports.updateDeliveryDate = async (req, res) => {
+  try {
+    const { customerId, orderId } = req.params;
+    const { deliveryNotifiedDate } = req.body;
 
-//   const number = req.body.number;
-//   const chatId = `${number}@c.us`;
+    if (!deliveryNotifiedDate) {
+      return res
+        .status(400)
+        .json({ error: "Delivery Notification Date is required." });
+    }
 
-//   if (!req.file) {
-//     return res.status(400).json({ success: false, message: 'No file uploaded' });
-//   }
+    // Find and update the latest (most recent) order for the customer
+    const updatedOrder = await Order.findOneAndUpdate(
+      { _id: orderId, customerId },
+      {
+        $set: {
+          deliveryNotifiedDate: new Date(deliveryNotifiedDate),
+          isDelivered: true,
+        },
+      },
+      { new: true }
+    );
 
-//   const tempPath = req.file.path;
-//   const targetPath = path.join(__dirname, '../media', req.file.originalname);
+    if (!updatedOrder) {
+      return res
+        .status(404)
+        .json({ error: "Order not found for this customer." });
+    }
 
-//   try {
-//     fs.mkdirSync(path.dirname(targetPath), { recursive: true });
-//     fs.renameSync(tempPath, targetPath);
-
-//     if (!client.info) {
-//       return res.status(503).json({ success: false, message: 'WhatsApp client not ready. Please try again later.' });
-//     }
-
-//     const media = MessageMedia.fromFilePath(targetPath);
-//     await client.sendMessage(chatId, media);
-
-//     res.json({ success: true, message: 'PDF sent via WhatsApp' });
-
-//   } catch (error) {
-//     console.error("Error sending PDF:", error);
-//     res.status(500).json({ success: false, error: error.message });
-//   }
-// };
+    res.status(200).json({
+      message: "Delivery date updated successfully.",
+      order: updatedOrder,
+    });
+  } catch (error) {
+    console.error("Error updating delivery date:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
