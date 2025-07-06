@@ -25,6 +25,6 @@ app.use('/api/dress-master', dressMasterRoutes);
 app.use('/api/customers', customerRoutes);
 app.use('/api/orders', orderRoutes);
 
-app.listen(5000, () => {
+app.listen(process.env.PORT || 5000, () => {
   console.log('Server running on http://localhost:5000');
 });
