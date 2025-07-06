@@ -19,7 +19,9 @@ app.use(cors());
 
 
 
-
+app.get('/', (req, res) => {
+  res.send('🎉 Laundry Management Backend is Running!');
+});
 app.use('/api/auth', authRoutes);
 app.use('/api/dress-master', dressMasterRoutes);
 app.use('/api/customers', customerRoutes);
