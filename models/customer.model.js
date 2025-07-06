@@ -9,7 +9,8 @@ const customerSchema = new mongoose.Schema({
   totalAmount: Number  , // <-- Add this
   isDelivered: Boolean  , // <-- Add this
   pickupPreference: { type: String, enum: ['Home', 'Shop'], default: 'Shop' },
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+  billNumber:{ type: String, required: false,unique: true}
 });
 
 module.exports = mongoose.model('Customer', customerSchema);

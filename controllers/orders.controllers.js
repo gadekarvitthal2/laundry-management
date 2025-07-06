@@ -280,7 +280,7 @@ exports.getAllOrdersWithCustomerInfo = async (req, res) => {
   }
 };
 
-exports.updateDeliveryDate = async (req, res) => {
+exports.updateDeliveryDateWhenOrderPlace = async (req, res) => {
   try {
     const { customerId, orderId } = req.params;
     const { deliveryNotifiedDate } = req.body;
@@ -316,5 +316,57 @@ exports.updateDeliveryDate = async (req, res) => {
   } catch (error) {
     console.error("Error updating delivery date:", error);
     res.status(500).json({ error: "Internal server error." });
+  }
+};
+
+exports.updateDeliveryDateWhenOrderComplete = async (req, res) => {
+  try {
+    const { customerId, orderId } = req.params;
+    // const { orderCompleteDate } = req.body;
+
+    // Find and update the latest (most recent) order for the customer
+    const updatedOrder = await Order.findOneAndUpdate(
+      { _id: orderId, customerId },
+      {
+        $set: {
+          orderCompleteDate: new Date().toISOString(),
+          isOrderCompleted: true,
+        },
+      },
+      { new: true }
+    );
+
+    if (!updatedOrder) {
+      return res
+        .status(404)
+        .json({ error: "Order not found for this customer." });
+    }
+
+    res.status(200).json({
+      message: "Order Completed date updated successfully.",
+      order: updatedOrder,
+    });
+  } catch (error) {
+    console.error("Error updating delivery date:", error);
+    res.status(500).json({ error: "Internal server error." });
+  }
+};
+
+exports.getNextBillNumberForRegister = async (req, res) => {
+  try {
+    const counter = await Counter.findById("orderId");
+
+    if (!counter) {
+      return res.status(404).json({ message: "Counter not found" });
+    }
+
+    const nextBillNumber = (counter.sequence_value + 1)
+      .toString()
+      .padStart(6, "0");
+
+    res.json({ billNumber: nextBillNumber });
+  } catch (err) {
+    console.error("Error getting next bill number", err);
+    res.status(500).json({ error: "Failed to generate bill number" });
   }
 };

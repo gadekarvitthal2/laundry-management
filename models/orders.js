@@ -78,6 +78,13 @@ const OrderSchema = new mongoose.Schema({
   deliveryNotifiedDate: {
     type: Date,
   },
+  isOrderCompleted: {
+    type: Boolean,
+    default: false,
+  },
+  orderCompleteDate: {
+    type: Date,
+  },
 });
 
 module.exports = mongoose.model('Order', OrderSchema);
