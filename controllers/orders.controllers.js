@@ -362,7 +362,7 @@ exports.getNextBillNumberForRegister = async (req, res) => {
 
     const nextBillNumber = (counter.sequence_value + 1)
       .toString()
-      .padStart(6, "0");
+      // .padStart(6, "0");
 
     res.json({ billNumber: nextBillNumber });
   } catch (err) {

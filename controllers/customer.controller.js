@@ -99,3 +99,36 @@ exports.updatePickupDate = async (req, res) => {
   }
 }
 
+exports.updateCustomerData = async (req, res) => {
+  const { customerId } = req.params;
+  try {
+    const updated = await Customer.findByIdAndUpdate(customerId, req.body, {
+      new: true,
+      runValidators: true, // optional
+    });
+    if (!updated) return res.status(404).json({ message: 'Customer not found' });
+    res.json(updated);
+  } catch (error) {
+    console.error('Update error:', error);
+    res.status(500).json({ error: 'Update failed' });
+  }
+};
+
+exports.deleteCustomer = async (req, res) => {
+  const { customerId } = req.params;
+
+  try {
+    // Step 1: Delete the customer
+    const deletedCustomer = await Customer.findByIdAndDelete(customerId);
+    if (!deletedCustomer) {
+      return res.status(404).json({ message: 'Customer not found' });
+    }
+
+    // Step 2: Delete related orders
+    await Order.deleteMany({ customerId: customerId });
+
+    res.status(200).json({ message: 'Customer and related orders deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+  }
+};
