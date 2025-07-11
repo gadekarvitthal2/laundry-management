@@ -11,5 +11,6 @@ router.get('/customer/info/:customerId', orderController.getAllOrdersWithCustome
 router.patch('/notify-update-delivery-date/customerid/:customerId/orderid/:orderId', orderController.updateDeliveryDateWhenOrderPlace);
 router.patch('/notify-update-delivery-complete-date/customerid/:customerId/orderid/:orderId', orderController.updateDeliveryDateWhenOrderComplete);
 router.get('/get-next-bill-no',orderController.getNextBillNumberForRegister)
+router.delete('/remove-order/:orderId',orderController.deleteOrderById)
 
 module.exports = router;

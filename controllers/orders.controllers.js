@@ -13,7 +13,8 @@ async function getNextBillNumber() {
     { $inc: { sequence_value: 1 } },
     { new: true, upsert: true }
   );
-  return counter.sequence_value.toString().padStart(6, "0"); // 👈 6-digit format
+  // return counter.sequence_value.toString().padStart(6, "0"); // 👈 6-digit format
+  return counter.sequence_value.toString()// 👈 6-digit format
 }
 
 exports.createOrder =
@@ -368,5 +369,18 @@ exports.getNextBillNumberForRegister = async (req, res) => {
   } catch (err) {
     console.error("Error getting next bill number", err);
     res.status(500).json({ error: "Failed to generate bill number" });
+  }
+};
+
+exports.deleteOrderById = async (req, res) => {
+  const { orderId } = req.params;
+  try {
+    const deletedOrder = await Order.findByIdAndDelete(orderId);
+    if (!deletedOrder) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+    res.status(200).json({ message: 'Order deleted successfully', deletedOrder });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
   }
 };
