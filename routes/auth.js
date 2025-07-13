@@ -50,11 +50,20 @@ router.post('/login', async (req, res) => {
       { expiresIn: '1h' }
     );
 
-    res.json({ message: 'Login successful', token });
+    res.json({
+      message: 'Login successful',
+      token,
+      user: {
+        fullName: user.fullName,
+        phone: user.phone,
+        address: user.address,
+      }
+    });
   } catch (err) {
     console.error('Login error:', err);
     res.status(500).json({ message: 'Server error' });
   }
-}); 
+});
+
 
 module.exports = router;
