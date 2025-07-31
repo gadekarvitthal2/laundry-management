@@ -31,7 +31,7 @@ exports.registerCustomer = async (req, res) => {
 
 exports.getAllCustomers = async (req, res) => {
   try {
-    const customers = await Customer.find().sort({ createdAt: -1 });
+    const customers = await Customer.find().sort({ fullName: 1 });
     res.status(200).json(customers);
   } catch (error) {
     console.error('Error fetching customers:', error);
